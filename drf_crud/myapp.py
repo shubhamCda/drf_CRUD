@@ -1,7 +1,7 @@
 import requests
 import json
 
-URL = ""
+URL = "http://127.0.0.1:8000/stuapi/"
 
 def get_data(id = None):
     data = {}
@@ -9,7 +9,7 @@ def get_data(id = None):
         data = {'id':id}
     json_data = json.dumps(data)
         
-    r = requests.get(url=URL, data = json_data)  # Make a GET request
+    r = requests.get(URL, data = json_data)  # Make a GET request
     
     data = r.json()                            # Parse the JSON data
     
