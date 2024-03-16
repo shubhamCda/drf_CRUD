@@ -1,6 +1,9 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 import json
+from django.views.generic import View
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 
 # Create your views here.
@@ -31,3 +34,34 @@ def json_data_view_02(request):
                                                       #MIME type -> multipurpose internet male extensions  
     return JsonResponse(EmpData)
 
+# CBV
+@method_decorator(csrf_exempt, name="dispatch")
+class jsonCBV(View):
+
+    def get(self, request, *args, **kwargs):
+        json_data = json.dumps({"msg": "This is a GET Method JSON Response"})
+        return HttpResponse(json_data, content_type="application/json")
+
+    # EmpData = {
+    #     "eno": 104,
+    #     "ename": "Soham",
+    #     "esal": 40000,
+    #     "eaddr": "Dadar"
+    #     }
+
+    # return JsonResponse(EmpData)
+
+    # *args(Variable length Arguments) ->any no. of arguments can be provide convert into tuple
+    # *kwargs(Variable length Key-Word Arguments) -> any keyword argument can be provided and it will convert into dictionary
+
+    def post(self,  request, *args, **kwargs):
+        json_data = json.dumps({'msg': 'This is a POST Method JSON Response'})
+        return HttpResponse(json_data, content_type="application/json")
+
+    def put(self,  request, *args, **kwargs):
+        json_data = json.dumps({'msg': 'This is a PUT Method JSON Response'})
+        return HttpResponse(json_data, content_type="application/json")
+
+    def delete(self,  request, *args, **kwargs):
+        json_data = json.dumps({'msg': 'This is a DELETE Method JSON Response'})
+        return HttpResponse(json_data, content_type="application/json")
