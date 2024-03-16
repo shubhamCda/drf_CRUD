@@ -4,6 +4,7 @@ import json
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from api.mixins import HttpResponseMixin
 
 
 # Create your views here.
@@ -36,11 +37,12 @@ def json_data_view_02(request):
 
 # CBV
 @method_decorator(csrf_exempt, name="dispatch")
-class jsonCBV(View):
+class jsonCBV(HttpResponseMixin,View):
 
     def get(self, request, *args, **kwargs):
         json_data = json.dumps({"msg": "This is a GET Method JSON Response"})
-        return HttpResponse(json_data, content_type="application/json")
+        # return HttpResponse(json_data, content_type="application/json")
+        return self.render_to_http_response(json_data)
 
     # EmpData = {
     #     "eno": 104,
@@ -56,12 +58,15 @@ class jsonCBV(View):
 
     def post(self,  request, *args, **kwargs):
         json_data = json.dumps({'msg': 'This is a POST Method JSON Response'})
-        return HttpResponse(json_data, content_type="application/json")
+        # return HttpResponse(json_data, content_type="application/json")
+        return self.render_to_http_response(json_data)
 
     def put(self,  request, *args, **kwargs):
         json_data = json.dumps({'msg': 'This is a PUT Method JSON Response'})
-        return HttpResponse(json_data, content_type="application/json")
+        # return HttpResponse(json_data, content_type="application/json")
+        return self.render_to_http_response(json_data)
 
     def delete(self,  request, *args, **kwargs):
         json_data = json.dumps({'msg': 'This is a DELETE Method JSON Response'})
-        return HttpResponse(json_data, content_type="application/json")
+        # return HttpResponse(json_data, content_type="application/json")
+        return self.render_to_http_response(json_data)
