@@ -3,9 +3,10 @@ import requests
 BASE_URL = "http://127.0.0.1:8000/"
 ENDPOINT = "api/"
 
-def get_resp(url):
-    response = requests.get(BASE_URL+ENDPOINT)
+def get_resp(id):
+    response = requests.get(BASE_URL+ENDPOINT+id)
     print(response.status_code)
     print(response.json())
 
-get_resp(url=BASE_URL+"users/") # Get all
+id = input("Enter some id: ")
+get_resp(id=id) # Get all

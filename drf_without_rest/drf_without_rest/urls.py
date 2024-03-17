@@ -4,5 +4,5 @@ from api import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', views.EmployeeDataCBV.as_view()),
+    path('api/<int:id>', views.EmployeeDataCBV.as_view()),
 ]
