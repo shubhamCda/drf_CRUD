@@ -1,0 +1,4 @@
+YAML(yaml aint markup language)
+
+@method_decorator(csrf_exempt,name='dispatch')
+name=dispatch --> for all http request csrf exemption is there

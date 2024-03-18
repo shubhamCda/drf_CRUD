@@ -2,7 +2,11 @@ import json
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic import View
+
+from api.utils import is_json
 from .models import Employee
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 # import json
 # from django.core.serializers import serialize
 from api.mixins import SerializeMixin, HttpResponseMixin
@@ -31,27 +35,27 @@ from api.mixins import SerializeMixin, HttpResponseMixin
 # class EmployeeDataCBV(SerializeMixin, View):
 #     def  get(self, request, id, *args, **kwargs):
 #         # return HttpResponse("This is a GET Method")
-                       
+
 #         # json_data = serialize('json', [emp], fields=('eno','ename', 'eaddr'))
 
 #         # by using mixins
 #         json_data = self.serialize([emp])
-        
+
 #         return HttpResponse(json_data, content_type= "application/json")
 
 ################################################################################
 
-# # Exception Handling 
-            
-#################################################################################            
-            
+# # Exception Handling
+
+#################################################################################
+
 # Exception Handling at  the Application Level
 
 # class EmployeeDataCBV(SerializeMixin, View):
 #     def  get(self,request,id,*args,**kwargs):
 #            emp = Employee.objects.get(id=id)
 #            json_data = self.serialize([emp])
-          
+
 #            return HttpResponse(json_data,content_type="application/json")
 
 
@@ -69,19 +73,19 @@ class EmployeeDataCBV(HttpResponseMixin, SerializeMixin, View):
             json_data = self.serialize([emp])
             # return HttpResponse(json_data,content_type="application/json", status=200)
             return self.render_to_http_res(json_data)
-            
-            
-#################################################################################            
-            
-# Here Problem is ->(model & pk) {'model': 'api.employee', 'pk': 1, 'fields': {'eno': 101, 'ename': 'shubham'}},    
+
+
+#################################################################################
+
+# Here Problem is ->(model & pk) {'model': 'api.employee', 'pk': 1, 'fields': {'eno': 101, 'ename': 'shubham'}},
 # class EmployeeListCBV(View):
 #     def get(self,request,*args,**kwargs):
 #         emps = Employee.objects.all()
 #         json_data = serialize('json',emps,fields=('eno','ename') )
 #         return HttpResponse(json_data,content_type="application/json")
 
-        
-# Solving aboves Problem ,    
+
+# Solving aboves Problem ,
 # class EmployeeListCBV(View):
 #     def get(self,request,*args,**kwargs):
 #         emps = Employee.objects.all()
@@ -97,7 +101,8 @@ class EmployeeDataCBV(HttpResponseMixin, SerializeMixin, View):
 #############################################################################
 
 # By using MIXINS method by mixins.py--> reducing aboves code and inc reusability
-class EmployeeListCBV(SerializeMixin, View):
+@method_decorator(csrf_exempt,name='dispatch')
+class EmployeeListCBV(SerializeMixin,HttpResponseMixin, View):
     def get(self,request,*args,**kwargs):
         emps = Employee.objects.all()
         json_data = self.serialize(emps )
@@ -108,3 +113,12 @@ class EmployeeListCBV(SerializeMixin, View):
         #     final_list.append(emp_data)    CODE
         # json_data = json.dumps(final_list)
         return HttpResponse(json_data,content_type="application/json")
+    @csrf_exempt
+    def post(self, requset, *args, **kwargs):
+        data = requset.body  # if you want to post data from external app
+        valid_json = is_json(data)
+        if not valid_json:
+            json_data=json.dumps({"error":"Invalid Json Data"})
+            return self.render_to_http_res(json_data, status=400)
+        json_data =json.dumps({'msg':'Data Received'})
+        return self.render_to_http_res(json_data)
