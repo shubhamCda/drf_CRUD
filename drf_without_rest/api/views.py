@@ -11,7 +11,86 @@ from django.utils.decorators import method_decorator
 # from django.core.serializers import serialize
 from api.mixins import SerializeMixin, HttpResponseMixin
 
-# Create your views here.
+
+# defining class to use only ONE ENDPOINT
+@method_decorator(csrf_exempt, name='dispatch')
+class EmployeeCRUDCBV(SerializeMixin,HttpResponseMixin, View):
+    def get_object_by_id(self, id):
+        try:
+            emp=Employee.objects.get(id=id)
+        except Employee.DoesNotExist:
+            emp=None
+        return emp
+    def get(self, request, *args, **kwargs):
+        data = request.body
+        valid_json= is_json(data)
+        if not valid_json:
+            json_data=json.dumps({'msg':'Please send the valid data only...'})
+            return self.render_to_http_res(json_data, status=400)
+        p_data = json.loads(data)
+        id=p_data.get('id', None)
+        if id is not None:
+            emp=self.get_object_by_id(id)
+            if emp is None:
+                json_data = json.dumps({'msg':'Resource is Unavailable...'})
+                return self.render_to_http_res(json_data, status=400)
+            json_data = self.serialize([emp])
+            return self.render_to_http_res(json_data)
+        qs = Employee.objects.all()
+        json_data = self.serialize(qs)
+        return self.render_to_http_res(json_data)
+
+    def post(self, request, *args, **kwargs):
+        data = request.body
+        valid_json = is_json(data)
+        if not valid_json:
+            json_data = json.dumps({'msg':'Invalid Json Data..!'})
+            return self.render_to_http_res(json_data, status=400)
+        empdata = json.loads(data)
+        form = EmployeeForm(empdata)
+        if form.is_valid():
+            form.save(commit=True)
+            json_data = json.dumps({'msg':'Resource created successfully....'})
+            return self.render_to_http_res(json_data)
+        if form.errors:
+            json_data = json.dumps(form.errors)
+            return self.render_to_http_res(json_data,status=400)
+
+    def put(self, request,*args,**kwargs):
+        data = request.body
+        valid_json = is_json(data)
+        if  not valid_json:
+            json_data = json.dumps({"error":"Invalid Json Data..."})
+            return self.render_to_http_res(json_data, status=400)
+        p_data = json.loads(data)
+        id = p_data.get('id', None)
+        if id is None:
+            json_data = json.dumps({'msg':"Missing argument: id"})
+            return self.render_to_http_res(json_data , status=400)
+        emp=self.get_object_by_id(id)
+        if emp is None:
+            json_data = json.dumps("Error! Resource to be updated does not exist.")
+            return self.render_to_http_res(json_data, status=404)
+        p_data = json.loads(data)
+        original_data = {
+            "eno": emp.eno,
+            "ename": emp.ename,
+            "esal": emp.esal,
+            "eaddr": emp.eaddr,
+        }
+        original_data.update(p_data)
+        form = EmployeeForm(original_data, instance=emp)
+        if form.is_valid():
+            form.save(commit=True)
+            json_data = json.dumps({'msg':'Employee details are updated Successfully.'})    
+            return self.render_to_http_res(json_data, status=201)
+        if form.errors:
+            json_data = json.dumps(form.errors)
+            return self.render_to_http_res(json_data, status=400)
+            
+
+
+# [1] Create your views here.
 # EmployeeDataCBV --> API
 # class EmployeeDataCBV_01(View):
 #     def  get(self, request, id, *args, **kwargs):
@@ -28,7 +107,7 @@ from api.mixins import SerializeMixin, HttpResponseMixin
 
 #############################################################################
 
-# API -> By using Serializer in Django inbuilt module Serializers
+# [2] API -> By using Serializer in Django inbuilt module Serializers
 # Serialization-> to convert py obj into JSON -- can be perform in two ways :
 #                  1. Using JsonSerializer()
 #                  2. Using rest_framework
@@ -45,7 +124,7 @@ from api.mixins import SerializeMixin, HttpResponseMixin
 
 ################################################################################
 
-# # Exception Handling
+# [3] Exception Handling
 
 #################################################################################
 
@@ -59,7 +138,7 @@ from api.mixins import SerializeMixin, HttpResponseMixin
 #            return HttpResponse(json_data,content_type="application/json")
 
 
-# Exception Handling at  the Project Level
+# [7] Exception Handling at  the Project Level
 @method_decorator(csrf_exempt, name='dispatch')
 class EmployeeDataCBV(HttpResponseMixin, SerializeMixin, View):
     def get_object_by_id(self,id):
@@ -130,7 +209,7 @@ class EmployeeDataCBV(HttpResponseMixin, SerializeMixin, View):
 
 #################################################################################
 
-# Here Problem is ->(model & pk) {'model': 'api.employee', 'pk': 1, 'fields': {'eno': 101, 'ename': 'shubham'}},
+# [4] Here Problem is ->(model & pk) {'model': 'api.employee', 'pk': 1, 'fields': {'eno': 101, 'ename': 'shubham'}},
 # class EmployeeListCBV(View):
 #     def get(self,request,*args,**kwargs):
 #         emps = Employee.objects.all()
@@ -138,7 +217,7 @@ class EmployeeDataCBV(HttpResponseMixin, SerializeMixin, View):
 #         return HttpResponse(json_data,content_type="application/json")
 
 
-# Solving aboves Problem ,
+# [5] Solving aboves Problem ,
 # class EmployeeListCBV(View):
 #     def get(self,request,*args,**kwargs):
 #         emps = Employee.objects.all()
@@ -153,32 +232,33 @@ class EmployeeDataCBV(HttpResponseMixin, SerializeMixin, View):
 
 #############################################################################
 
-# By using MIXINS method by mixins.py--> reducing aboves code and inc reusability
-@method_decorator(csrf_exempt,name='dispatch')
-class EmployeeListCBV(SerializeMixin,HttpResponseMixin, View):
-    def get(self,request,*args,**kwargs):
-        emps = Employee.objects.all()
-        json_data = self.serialize(emps )
-        # p_data = json.loads(json_data)
-        # final_list = []                    NO   (replaced with SerializeMixin)
-        # for obj in p_data:                 NEED
-        #     emp_data = obj['fields']       THIS
-        #     final_list.append(emp_data)    CODE
-        # json_data = json.dumps(final_list)
-        return HttpResponse(json_data,content_type="application/json")
-    @csrf_exempt
-    def post(self, requset, *args, **kwargs):
-        data = requset.body  # if you want to post data from external app
-        valid_json = is_json(data)
-        if not valid_json:
-            json_data=json.dumps({"error":"Invalid Json Data"})
-            return self.render_to_http_res(json_data, status=400)
-        empdata = json.loads(data)
-        form = EmployeeForm(empdata)
-        if form.is_valid():
-            form.save(commit=True)
-            json_data = json.dumps({'msg':'Resource is created...'})
-            return self.render_to_http_res(json_data,status=201)
-        if form.errors:
-            json_data= json.dumps(form.errors)
-            return self.render_to_http_res(json_data,status=400)
+# [6] By using MIXINS method by mixins.py--> reducing aboves code and inc reusability
+
+# @method_decorator(csrf_exempt,name='dispatch')
+# class EmployeeListCBV(SerializeMixin,HttpResponseMixin, View):
+#     def get(self,request,*args,**kwargs):
+#         emps = Employee.objects.all()
+#         json_data = self.serialize(emps )
+#         # p_data = json.loads(json_data)
+#         # final_list = []                    NO   (replaced with SerializeMixin)
+#         # for obj in p_data:                 NEED
+#         #     emp_data = obj['fields']       THIS
+#         #     final_list.append(emp_data)    CODE
+#         # json_data = json.dumps(final_list)
+#         return HttpResponse(json_data,content_type="application/json")
+#     @csrf_exempt
+#     def post(self, requset, *args, **kwargs):
+#         data = requset.body  # if you want to post data from external app
+#         valid_json = is_json(data)
+#         if not valid_json:
+#             json_data=json.dumps({"error":"Invalid Json Data"})
+#             return self.render_to_http_res(json_data, status=400)
+#         empdata = json.loads(data)
+#         form = EmployeeForm(empdata)
+#         if form.is_valid():
+#             form.save(commit=True)
+#             json_data = json.dumps({'msg':'Resource is created...'})
+#             return self.render_to_http_res(json_data,status=201)
+#         if form.errors:
+#             json_data= json.dumps(form.errors)
+#             return self.render_to_http_res(json_data,status=400)

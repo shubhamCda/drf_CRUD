@@ -21,19 +21,32 @@ ENDPOINT = "api/"
 # # id = input("Enter some id: ")
 # # get_resp(id=id) # Get all
 
-def get_resp(id): 
-    response = requests.get(BASE_URL+ENDPOINT+id)
-    print(response.status_code)
-    print(response.json())
+# def get_resp(id): 
+#     response = requests.get(BASE_URL+ENDPOINT+id)
+#     print(response.status_code)
+#     print(response.json())
+    
+# to use only one ENDPOINT    
+# def get_res(id=None): 
+#     data = {}
+#     if id is not None:
+#         data = {
+#             'id':id
+#         }
+#     response = requests.get(BASE_URL+ENDPOINT, json=data)
+#     print(response.status_code)
+#     print(response.json())
+    
+# get_res()
 
 # id = input("Enter some id: ")
 # get_resp(id=id) # Get all
 
 # EmployeeListCBV
-def get_all():
-    response = requests.get(BASE_URL+ENDPOINT)
-    print(response.status_code)
-    print(response.json())
+# def get_all():
+#     response = requests.get(BASE_URL+ENDPOINT)
+#     print(response.status_code)
+#     print(response.json())
 
 # get_all()
 # get_resp('11')
@@ -42,38 +55,44 @@ def get_all():
             # py manage.py dumpdata api.Employee --format json --indent 4 --> ame as above (default:JSON format)
 
 # for POST request
-def create_resource():
-    new_emp = {
-        'eno': 700,
-        'ename':'Mary Kom',
-        'esal': 40000,
-        'eaddr':'Guwhati'
-    }
-    # json_data = json.dumps(new_emp)   # Converts Python object into JSON String format
-    res = requests.post(BASE_URL + ENDPOINT, json=new_emp)
-    print(res.status_code)
-    print(res.json())
+# def create_resource():
+#     new_emp = {
+#         'eno': 700,
+#         'ename':'Mary Kom',
+#         'esal': 24000,
+#         'eaddr':'Guwhati'
+#     }
+# #     # json_data = json.dumps(new_emp)   # Converts Python object into JSON String format
+#     res = requests.post(BASE_URL + ENDPOINT, json=new_emp)
+#     print(res.status_code)
+#     print(res.json())
+    
+# create_resource()
     
     
     
 def update_resource(id):
     new_emp = {
+        'id':id,
         'esal': 50000,
         'eaddr':'Delhi'
     }
     # json_data = json.dumps(new_emp)   # Converts Python object into JSON String format
-    res = requests.put(BASE_URL + ENDPOINT+str(id), json=new_emp)
+    # res = requests.put(BASE_URL + ENDPOINT+str(id), json=new_emp) With passing ID
+    res = requests.put(BASE_URL + ENDPOINT, json=new_emp)  # only 1 ENDPOINT
     print(res.status_code)
     print(res.json())
     
-def delete_resource(id):
-    new_emp = {
-        'esal': 50000,
-        'eaddr':'Delhi'
-    }
-    # json_data = json.dumps(new_emp)   # Converts Python object into JSON String format
-    res = requests.delete(BASE_URL + ENDPOINT+str(id), json=new_emp)
-    print(res.status_code)
-    print(res.json())
+update_resource(4)
+    
+# def delete_resource(id):
+#     new_emp = {
+#         'esal': 50000,
+#         'eaddr':'Delhi'
+#     }
+#     # json_data = json.dumps(new_emp)   # Converts Python object into JSON String format
+#     res = requests.delete(BASE_URL + ENDPOINT+str(id), json=new_emp)
+#     print(res.status_code)
+#     print(res.json())
 
-delete_resource(5)
+# delete_resource(5)
