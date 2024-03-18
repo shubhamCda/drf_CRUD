@@ -76,4 +76,4 @@ def delete_resource(id):
     print(res.status_code)
     print(res.json())
 
-delete_resource(6)
+delete_resource(5)

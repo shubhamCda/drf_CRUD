@@ -68,10 +68,7 @@ class EmployeeDataCBV(HttpResponseMixin, SerializeMixin, View):
         except Employee.DoesNotExist:
             emp=None
         return emp 
-            
-        
-        
-        
+
     def  get(self,request,id,*args,**kwargs):
         try:
             emp = Employee.objects.get(id=id)
@@ -83,10 +80,7 @@ class EmployeeDataCBV(HttpResponseMixin, SerializeMixin, View):
             json_data = self.serialize([emp])
             # return HttpResponse(json_data,content_type="application/json", status=200)
             return self.render_to_http_res(json_data)
-        
-        
-        
-        
+
     # implement PUT method
     def put(self, request,id, *args, **kwargs):
         emp=self.get_object_by_id(id)
@@ -115,6 +109,24 @@ class EmployeeDataCBV(HttpResponseMixin, SerializeMixin, View):
             json_data=json.dumps({'error':form.errors})
             return self.render_to_http_res(json_data,status=400)
 
+
+    # Implement DELETE Method
+    def delete(self,request, id,*args,**kwargs):
+        emp=self.get_object_by_id(id)
+        if emp is None:
+            json_data = json.dumps({"message":"Employee does not exist"})
+            return self.render_to_http_res(json_data, status=404)
+        
+        # t = emp.delete()  
+        # print(t)  # it will return tuple -> (1, {'api.Employee': 1}) 1-> status, {'api.Employee': 1} -> employee object
+
+        status, deleted_item = emp.delete()
+        if status == 1:
+            json_data = json.dumps({ "message": "Deleted Successfully", "deleted item": deleted_item })
+            return self.render_to_http_res(json_data, status=200)
+            
+        json_data = json.dumps({'msg':'Resource  deleted Successfully..!'})
+        return self.render_to_http_res(json_data)
 
 #################################################################################
 
