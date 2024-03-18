@@ -60,8 +60,18 @@ from api.mixins import SerializeMixin, HttpResponseMixin
 
 
 # Exception Handling at  the Project Level
-
+@method_decorator(csrf_exempt, name='dispatch')
 class EmployeeDataCBV(HttpResponseMixin, SerializeMixin, View):
+    def get_object_by_id(self,id):
+        try:
+            emp=Employee.objects.get(id=id)
+        except Employee.DoesNotExist:
+            emp=None
+        return emp 
+            
+        
+        
+        
     def  get(self,request,id,*args,**kwargs):
         try:
             emp = Employee.objects.get(id=id)
@@ -73,6 +83,37 @@ class EmployeeDataCBV(HttpResponseMixin, SerializeMixin, View):
             json_data = self.serialize([emp])
             # return HttpResponse(json_data,content_type="application/json", status=200)
             return self.render_to_http_res(json_data)
+        
+        
+        
+        
+    # implement PUT method
+    def put(self, request,id, *args, **kwargs):
+        emp=self.get_object_by_id(id)
+        if emp is None:
+            json_data = json.dumps({'msg': 'Invalid Employee ID'})
+            return self.render_to_http_res(json_data,status=404)
+        data = request.body
+        valid_json = is_json(data)
+        if  not valid_json:
+            json_data=json.dumps({'error':'Bad Request : JSON Data Required'})
+            return self.render_to_http_res(json_data,status=400)
+        p_data=json.loads(data)
+        original_data = {
+            'eno':emp.eno,
+            'ename':emp.ename,
+            'esal':emp.esal,
+            'eaddr':emp.eaddr
+        }
+        original_data.update(p_data)
+        form=EmployeeForm(original_data, instance=emp) #instance=emp will set the values of fields to existing record(DB)
+        if form.is_valid():
+            form.save(commit=True)
+            json_data=json.dumps({'msg':'Updated successfully.....'})
+            return self.render_to_http_res(json_data,status=201)
+        if form.errors:
+            json_data=json.dumps({'error':form.errors})
+            return self.render_to_http_res(json_data,status=400)
 
 
 #################################################################################

@@ -41,16 +41,39 @@ def get_all():
             # py manage.py dumpdata api.Employee --indent 4 to arrange
             # py manage.py dumpdata api.Employee --format json --indent 4 --> ame as above (default:JSON format)
 
+# for POST request
 def create_resource():
     new_emp = {
-        'eno': 600,
-        'ename':'Jane Doe',
+        'eno': 700,
+        'ename':'Mary Kom',
         'esal': 40000,
-        'eaddr':'New Orleans'
+        'eaddr':'Guwhati'
     }
     # json_data = json.dumps(new_emp)   # Converts Python object into JSON String format
     res = requests.post(BASE_URL + ENDPOINT, json=new_emp)
     print(res.status_code)
     print(res.json())
+    
+    
+    
+def update_resource(id):
+    new_emp = {
+        'esal': 50000,
+        'eaddr':'Delhi'
+    }
+    # json_data = json.dumps(new_emp)   # Converts Python object into JSON String format
+    res = requests.put(BASE_URL + ENDPOINT+str(id), json=new_emp)
+    print(res.status_code)
+    print(res.json())
+    
+def delete_resource(id):
+    new_emp = {
+        'esal': 50000,
+        'eaddr':'Delhi'
+    }
+    # json_data = json.dumps(new_emp)   # Converts Python object into JSON String format
+    res = requests.delete(BASE_URL + ENDPOINT+str(id), json=new_emp)
+    print(res.status_code)
+    print(res.json())
 
-create_resource()
+delete_resource(6)
