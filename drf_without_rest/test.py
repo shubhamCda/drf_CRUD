@@ -7,7 +7,7 @@ ENDPOINT = "api/"
 
 # Apllication Level Exception Handling
 
-# def get_resp(id): 
+# def get_resp(id):
 #     response = requests.get(BASE_URL+ENDPOINT+id)
 #     # if response.status_code in range(200,300): //OR//
 #     if response.status_code == requests.codes.ok:   # Using requests module's 'ok' attribute to check for status code 200
@@ -35,4 +35,7 @@ def get_all():
     print(response.json())
 
 # get_all()
-get_resp('11')
+# get_resp('11')
+get_all()  # To call all the entries from database --> drf_without_rest> py manage.py dumpdata api.Employee
+            # py manage.py dumpdata api.Employee --indent 4 to arrange
+            # py manage.py dumpdata api.Employee --format json --indent 4 --> ame as above (default:JSON format)

@@ -102,7 +102,7 @@ class EmployeeListCBV(SerializeMixin, View):
         emps = Employee.objects.all()
         json_data = self.serialize(emps )
         # p_data = json.loads(json_data)
-        # final_list = []                    NO
+        # final_list = []                    NO   (replaced with SerializeMixin)
         # for obj in p_data:                 NEED
         #     emp_data = obj['fields']       THIS
         #     final_list.append(emp_data)    CODE
