@@ -2,3 +2,21 @@ YAML(yaml aint markup language)
 
 @method_decorator(csrf_exempt,name='dispatch')
 name=dispatch --> for all http request csrf exemption is there
+
+
+1. To get a particular record based on id
+    http://127.0.0.1:8000/api/1
+
+2. To create a particular record
+    http://127.0.0.1:8000/api/create  ---> send post request with data in
+
+3. To get all the records
+    http://127.0.0.1:8000/api/
+
+3. To update the records
+    http://127.0.0.1:8000/api/1
+
+4. To delete a particular record
+    http://127.0.0.1:8000/api/1
+
+** but in real-time coding std we need only one ENDPOINT
