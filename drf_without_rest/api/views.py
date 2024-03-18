@@ -2,7 +2,7 @@ import json
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic import View
-
+from .forms import EmployeeForm
 from api.utils import is_json
 from .models import Employee
 from django.views.decorators.csrf import csrf_exempt
@@ -120,5 +120,12 @@ class EmployeeListCBV(SerializeMixin,HttpResponseMixin, View):
         if not valid_json:
             json_data=json.dumps({"error":"Invalid Json Data"})
             return self.render_to_http_res(json_data, status=400)
-        json_data =json.dumps({'msg':'Data Received'})
-        return self.render_to_http_res(json_data)
+        empdata = json.loads(data)
+        form = EmployeeForm(empdata)
+        if form.is_valid():
+            form.save(commit=True)
+            json_data = json.dumps({'msg':'Resource is created...'})
+            return self.render_to_http_res(json_data,status=201)
+        if form.errors:
+            json_data= json.dumps(form.errors)
+            return self.render_to_http_res(json_data,status=400)

@@ -43,10 +43,10 @@ def get_all():
 
 def create_resource():
     new_emp = {
-        'eno': 500,
-        'ename':'John Doe',
-        'esal': 23000,
-        'eaddr':'New York'
+        'eno': 600,
+        'ename':'Jane Doe',
+        'esal': 40000,
+        'eaddr':'New Orleans'
     }
     # json_data = json.dumps(new_emp)   # Converts Python object into JSON String format
     res = requests.post(BASE_URL + ENDPOINT, json=new_emp)
