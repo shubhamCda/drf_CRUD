@@ -69,8 +69,9 @@ class EmployeeCRUDCBV(SerializeMixin,HttpResponseMixin, View):
             return self.render_to_http_res(json_data , status=400)
         emp=self.get_object_by_id(id)
         if emp is None:
-            json_data = json.dumps("Error! Resource to be updated does not exist.")
+            json_data = json.dumps({'msg':"Error! Resource to be updated does not exist."})
             return self.render_to_http_res(json_data, status=404)
+        
         p_data = json.loads(data)
         original_data = {
             "eno": emp.eno,
@@ -87,7 +88,28 @@ class EmployeeCRUDCBV(SerializeMixin,HttpResponseMixin, View):
         if form.errors:
             json_data = json.dumps(form.errors)
             return self.render_to_http_res(json_data, status=400)
-            
+    
+    def delete(self,request, *args, **kwargs):
+        data = request.body
+        valid_json = is_json(data)
+        if not valid_json:
+            json_data = json.dump({'msg':'Resource is not available...'})
+            return self.render_to_http_res(json_data,status=404)
+        p_data = json.loads(data)
+        id = p_data.get('id', None)
+        if id is not None:
+            emp = self.get_object_by_id(id)
+            if emp is None:
+               json_data = json.dumps({'msg':'Employee record Not Found'})
+               return self.render_to_http_res(json_data, status=400)
+            status, deleted_item = emp.delete()  # Delete the employee object from database
+            if status == 1 :
+                json_data = json.dumps({'msg':'Employee Record has been deleted Successfully'})
+                return self.render_to_http_res(json_data, status=200)
+            json_data = json.dumps({'msg':'Failed to delete the Employee Record!'})
+            return self.render_to_http_res(json_data, status=503)
+        json_data = json.dumps({'msg':'Please provide a valid id..'})
+        return self.render_to_http_res(json_data, status=400)
 
 
 # [1] Create your views here.

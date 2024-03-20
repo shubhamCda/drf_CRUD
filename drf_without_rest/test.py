@@ -71,19 +71,19 @@ ENDPOINT = "api/"
     
     
     
-def update_resource(id):
-    new_emp = {
-        'id':id,
-        'esal': 50000,
-        'eaddr':'Delhi'
-    }
-    # json_data = json.dumps(new_emp)   # Converts Python object into JSON String format
-    # res = requests.put(BASE_URL + ENDPOINT+str(id), json=new_emp) With passing ID
-    res = requests.put(BASE_URL + ENDPOINT, json=new_emp)  # only 1 ENDPOINT
-    print(res.status_code)
-    print(res.json())
+# def update_resource(id):
+#     new_emp = {
+#         'id':id,
+#         'esal': 50000,
+#         'eaddr':'Delhi'
+#     }
+#     # json_data = json.dumps(new_emp)   # Converts Python object into JSON String format
+#     # res = requests.put(BASE_URL + ENDPOINT+str(id), json=new_emp) With passing ID
+#     res = requests.put(BASE_URL + ENDPOINT, json=new_emp)  # only 1 ENDPOINT
+#     print(res.status_code)
+#     print(res.json())
     
-update_resource(4)
+# update_resource(10)
     
 # def delete_resource(id):
 #     new_emp = {
@@ -96,3 +96,15 @@ update_resource(4)
 #     print(res.json())
 
 # delete_resource(5)
+
+# For single ENDPOINT url
+def delete_resource(id):
+    new_emp = {
+        'id':id,
+    }
+    # json_data = json.dumps(new_emp)   # Converts Python object into JSON String format
+    res = requests.delete(BASE_URL + ENDPOINT, json=new_emp)
+    print(res.status_code)
+    print(res.json())
+
+delete_resource(4)
